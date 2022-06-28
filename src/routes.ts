@@ -53,23 +53,49 @@ routes.post("/newUser", async (req, res) => {
     response.passwordHash = "";
     return res.status(201).json(response);
   } catch (error) {
-    let response = "";
     let erroDuplicatedUser = JSON.stringify(error);
     erroDuplicatedUser = JSON.parse(erroDuplicatedUser).code;
 
     if (erroDuplicatedUser == "P2002") {
-      return res.status(500).json({ erro: "Usuário ou número de telefone duplicado" });
+      return res
+        .status(500)
+        .json({ erro: "Usuário ou número de telefone duplicado" });
     } else {
       return res.status(500).json(error);
     }
   }
 });
 
-// routes.patch("/editCategory/:id", async (req, res) => {
-//   const id = req.params.id;
-//   const edittedUser = await prisma.User.update({
-//     where: { id: id },
-//     data: { userName: "NomeDaLoja", phone: "1222" },
-//   });
-//   console.log(edittedUser);
-// });
+routes.patch("/editUser/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { userName, phone, password } = req.body;
+    if (
+      !password ||
+      !password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)
+    ) {
+      return res.status(400).json({
+        msg: "Password is required and must have at least 6 characters, at least one letter and one number.",
+      });
+    }
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const edittedUser = await prisma.User.update({
+      where: { id: id },
+      data: { userName: userName, phone: phone, passwordHash: hashedPassword },
+    });
+    console.log(edittedUser);
+    return res.status(201).json(edittedUser);
+  } catch (error) {
+    let erroDuplicatedUser = JSON.stringify(error);
+    erroDuplicatedUser = JSON.parse(erroDuplicatedUser).code;
+
+    if (erroDuplicatedUser == "P2002") {
+      return res
+        .status(500)
+        .json({ erro: "Usuário ou número de telefone duplicado" });
+    } else {
+      return res.status(500).json(error);
+    }
+  }
+});
