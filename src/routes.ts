@@ -53,8 +53,15 @@ routes.post("/newUser", async (req, res) => {
     response.passwordHash = "";
     return res.status(201).json(response);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json(error);
+    let response = "";
+    let erroDuplicatedUser = JSON.stringify(error);
+    erroDuplicatedUser = JSON.parse(erroDuplicatedUser).code;
+
+    if (erroDuplicatedUser == "P2002") {
+      return res.status(500).json({ erro: "Usuário ou número de telefone duplicado" });
+    } else {
+      return res.status(500).json(error);
+    }
   }
 });
 
