@@ -48,9 +48,10 @@ routes.post("/newUser", async (req, res) => {
         passwordHash: hashedPassword,
       },
     });
-    console.log(NewUser);
+
     const response = NewUser;
     response.passwordHash = "";
+    console.log(response);
     return res.status(201).json(response);
   } catch (error) {
     let erroDuplicatedUser = JSON.stringify(error);
@@ -97,5 +98,28 @@ routes.patch("/editUser/:id", async (req, res) => {
     } else {
       return res.status(500).json(error);
     }
+  }
+});
+
+routes.post("/newProduct", async (req, res) => {
+  try {
+    const { title, price, description, category } = req.body;
+    const newProduct = await prisma.Product.create({
+      data: {
+        title,
+        price,
+        description,
+        category: {
+          connect: {
+            id: category,
+          },
+        },
+      },
+    });
+    console.log(newProduct);
+    return res.status(201).json(newProduct);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(error);
   }
 });
