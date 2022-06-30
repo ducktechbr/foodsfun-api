@@ -79,12 +79,8 @@ routes.get(
       if (!loggedInUser) {
         return res.status(404).json({ msg: "usuário não encontrado" });
       }
-      const getUser = await prisma.user.findUnique({
-        where: { userName: loggedInUser.userName },
-      });
-
-      console.log(getUser);
-      return res.status(200).json(getUser);
+      console.log(req.auth);
+      return res.status(200).json(req.auth);
     } catch (error) {
       console.error(error);
       return res.status(500).json(error);
@@ -99,14 +95,16 @@ routes.post(
   async (req: any, res: any) => {
     try {
       const loggedInUser = req.auth;
+      const userId = loggedInUser.id;
       if (!loggedInUser) {
         return res.status(404).json({ msg: "usuário não encontrado" });
       }
-      const { title, userId } = req.body;
+      const { title, description } = req.body;
 
       const post = await prisma.category.create({
         data: {
-          title: title,
+          title,
+          description,
           user: {
             connect: {
               id: userId,
@@ -123,53 +121,15 @@ routes.post(
   }
 );
 
-routes.patch(
-  "/editUser",
-  isAuthenticated,
-  attachCurrentUser,
-  async (req: any, res: any) => {
-    try {
-      const { userName, email, id } = req.auth;
-      const { password } = req.body;
-      if (
-        !password ||
-        !password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)
-      ) {
-        return res.status(400).json({
-          msg: "Password is required and must have at least 6 characters, at least one letter and one number, and no simbols",
-        });
-      }
-      const salt = await bcrypt.genSalt(saltRounds);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      const edittedUser = await prisma.user.update({
-        where: { id },
-        data: { userName, email, passwordHash: hashedPassword },
-      });
-      console.log(edittedUser);
-      return res.status(201).json(edittedUser);
-    } catch (error) {
-      let erroDuplicatedUser = JSON.stringify(error);
-      erroDuplicatedUser = JSON.parse(erroDuplicatedUser).code;
-
-      if (erroDuplicatedUser == "P2002") {
-        return res
-          .status(500)
-          .json({ erro: "Usuário ou número de telefone duplicado" });
-      } else {
-        return res.status(500).json(error);
-      }
-    }
-  }
-);
-
 routes.post("/newProduct", async (req, res) => {
   try {
-    const { title, price, description, category } = req.body;
+    const { title, price, description, image, category } = req.body;
     const newProduct: any = await prisma.product.create({
       data: {
         title,
         price,
         description,
+        image,
         category: {
           connect: {
             id: category,
@@ -184,6 +144,45 @@ routes.post("/newProduct", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+// routes.patch(
+//   "/editUser",
+//   isAuthenticated,
+//   attachCurrentUser,
+//   async (req: any, res: any) => {
+//     try {
+//       const { userName, email, id } = req.auth;
+//       const { password } = req.body;
+//       if (
+//         !password ||
+//         !password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)
+//       ) {
+//         return res.status(400).json({
+//           msg: "Password is required and must have at least 6 characters, at least one letter and one number, and no simbols",
+//         });
+//       }
+//       const salt = await bcrypt.genSalt(saltRounds);
+//       const hashedPassword = await bcrypt.hash(password, salt);
+//       const edittedUser = await prisma.user.update({
+//         where: { id },
+//         data: { userName, email, passwordHash: hashedPassword },
+//       });
+//       console.log(edittedUser);
+//       return res.status(201).json(edittedUser);
+//     } catch (error) {
+//       let erroDuplicatedUser = JSON.stringify(error);
+//       erroDuplicatedUser = JSON.parse(erroDuplicatedUser).code;
+
+//       if (erroDuplicatedUser == "P2002") {
+//         return res
+//           .status(500)
+//           .json({ erro: "Usuário ou número de telefone duplicado" });
+//       } else {
+//         return res.status(500).json(error);
+//       }
+//     }
+//   }
+// );
 
 routes.get("/getCaterogy/:id", async (req, res) => {
   try {
