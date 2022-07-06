@@ -1,4 +1,5 @@
 var { expressjwt: jwt } = require("express-jwt");
+require("dotenv").config();
 
 function extractTokenFromHeaders(req, res) {
   if (!req.headers.authorization) {
