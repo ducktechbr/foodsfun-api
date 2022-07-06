@@ -124,18 +124,19 @@ routes.post(
 routes.post("/newProduct", async (req, res) => {
   try {
     const { title, price, description, image, category } = req.body;
-    const newProduct: any = await prisma.product.create({
-      data: {
-        title,
-        price,
-        description,
-        image,
-        category: {
-          connect: {
-            id: category,
-          },
+    const data:any = {
+      title,
+      price,
+      description,
+      image,
+      category: {
+        connect: {
+          id: category,
         },
       },
+    };
+    const newProduct = await prisma.product.create({
+      data
     });
     console.log(newProduct);
     return res.status(201).json(newProduct);
