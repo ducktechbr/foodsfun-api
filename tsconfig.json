@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "outDir": "dist",
+    "module": "commonjs",
+    "outDir": "./build",
     "strict": true,
-    "lib": ["esnext"],
-    "esModuleInterop": true
-  }
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"]
 }
