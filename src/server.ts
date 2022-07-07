@@ -9,6 +9,7 @@ app.use(express.json()); // get - buscar informaçoes , post - cadastrar informa
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "*")
   cors({ origin: "http://localhost:3000" });
   next();
 });
