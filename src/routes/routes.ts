@@ -124,7 +124,7 @@ routes.post(
 routes.post("/newProduct", async (req, res) => {
   try {
     const { title, price, description, image, category } = req.body;
-    const data:any = {
+    const data: any = {
       title,
       price,
       description,
@@ -136,7 +136,7 @@ routes.post("/newProduct", async (req, res) => {
       },
     };
     const newProduct = await prisma.product.create({
-      data
+      data,
     });
     console.log(newProduct);
     return res.status(201).json(newProduct);
@@ -185,19 +185,28 @@ routes.post("/newProduct", async (req, res) => {
 //   }
 // );
 
-routes.get("/getCaterogy/:id", async (req, res) => {
-  try {
-    const userId: any = req.params.id;
-    const userCategories = await prisma.category.findMany({
-      where: { userId },
-    });
-    console.log(userCategories);
-    return res.status(200).json(userCategories);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json(error);
+routes.get(
+  "/getCaterogy/",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req: any, res: any) => {
+    try {
+      const loggedInUser = req.auth;
+      const userId = loggedInUser.id;
+      if (!loggedInUser) {
+        return res.status(404).json({ msg: "usuário não encontrado" });
+      }
+      const userCategories = await prisma.category.findMany({
+        where: { userId },
+      });
+      console.log(userCategories);
+      return res.status(200).json(userCategories);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
   }
-});
+);
 
 routes.get("/getProducts/:id", async (req, res) => {
   try {
