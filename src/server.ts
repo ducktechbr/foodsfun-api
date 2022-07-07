@@ -9,10 +9,10 @@ app.use(express.json()); // get - buscar informaçoes , post - cadastrar informa
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-  cors({ origin: process.env.NEXT_APP_URL });
+  cors({ origin: "http://localhost:3000" });
   next();
 });
-
+// process.env.NEXT_APP_URL
 app.use(routes);
 
 app.listen(config.server.port, () =>
