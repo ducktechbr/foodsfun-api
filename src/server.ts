@@ -10,14 +10,14 @@ app.use(express.json()); // get - buscar informaçoes , post - cadastrar informa
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, Content-Type, X-Auth-Token"
+    "Access-Control-Allow-Methods",
+    "DELETE, POST, GET, OPTIONS, PATCH, PUT"
   );
   res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PATCH, PUT, DELETE, OPTIONS"
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, X-Requested-With"
   );
-  cors({ origin: "http://localhost:3000" });
+  cors();
   next();
 });
 // process.env.NEXT_APP_URL
