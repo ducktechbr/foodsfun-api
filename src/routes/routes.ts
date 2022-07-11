@@ -186,7 +186,7 @@ routes.post("/newProduct", async (req, res) => {
 // );
 
 routes.get(
-  "/getCaterogy/",
+  "/getCategory",
   isAuthenticated,
   attachCurrentUser,
   async (req: any, res: any) => {

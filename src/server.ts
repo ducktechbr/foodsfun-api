@@ -5,6 +5,8 @@ import { config } from "./config/config";
 
 const app = express();
 
+app.options("*", cors());
+
 app.use(express.json()); // get - buscar informaçoes , post - cadastrar informaçoes, put - atualizar informaçoes, delete - deletar informaçoes, patch - atualizar parcialmente
 
 app.use((req, res, next) => {
