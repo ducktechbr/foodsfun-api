@@ -208,11 +208,15 @@ routes.get(
   }
 );
 
-routes.get("/getProducts/:id", async (req, res) => {
+routes.get("/getProducts/:category", async (req, res) => {
   try {
-    const categoryId = req.params.id;
+    const category: any = req.params.category;
+    const categoryForId = await prisma.category.findFirst({
+      where: { title: category },
+    });
+    const categoryId = categoryForId?.id;
     const categoryProducts = await prisma.product.findMany({
-      where: { categoryId },
+      where: { categoryId: categoryId },
     });
     console.log(categoryProducts);
     return res.status(200).json(categoryProducts);

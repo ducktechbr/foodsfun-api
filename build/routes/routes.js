@@ -253,7 +253,7 @@ exports.routes.post("/newProduct", function (req, res) { return __awaiter(void 0
 //     }
 //   }
 // );
-exports.routes.get("/getCaterogy/", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.get("/getCategory", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, userCategories, error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
