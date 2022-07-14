@@ -244,12 +244,112 @@ routes.get(
       const categoryProducts = await prisma.product.findMany({
         where: { categoryId: categoryId },
       });
-      
+
       console.log(categoryProducts);
       return res.status(200).json(categoryProducts);
     } catch (error) {
       console.error(error);
       return res.status(500).json(error);
     }
+  }
+);
+
+routes.delete(
+  "/deleteProduct",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req: any, res) => {
+    try {
+      // retira o loggedinuser da requisição pelo middleware attachCurrentUser
+
+      const loggedInUser = req.auth;
+
+      // retira o userId do loggedInUser
+
+      const userId = loggedInUser.id;
+
+      // testa se o loggedInUser foi encontrado
+
+      if (!loggedInUser) {
+        return res.status(404).json({ msg: "usuário não encontrado" });
+      }
+
+      // criada variável com id do produto e da categoria que vem no body da requisição para delete
+
+      const { prodId, catId } = req.body;
+
+      // busca no banco de dados a categoria passada pela requisição
+
+      const categoryForId: any = await prisma.category.findFirst({
+        where: { id: catId },
+      });
+
+      // caso o ID do usuário da categoria passada seja igual ao id do login, deleta o produto
+
+      if (categoryForId.userId === userId) {
+        const deletedProduct = await prisma.product.delete({
+          where: { id: prodId },
+        });
+        console.log(deletedProduct);
+        return res.status(200).json(deletedProduct);
+      }
+
+      // tratamento de erros
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
+  }
+);
+
+routes.patch(
+  "/editProduct",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req: any, res) => {
+    try {
+      // retira o loggedinuser da requisição pelo middleware attachCurrentUser
+
+      const loggedInUser = req.auth;
+
+      // retira o userId do loggedInUser
+
+      const userId = loggedInUser.id;
+
+      // testa se o loggedInUser foi encontrado
+
+      if (!loggedInUser) {
+        return res.status(404).json({ msg: "usuário não encontrado" });
+      }
+
+      // criada variável com id do produto e da categoria que vem no body da requisição para delete
+
+      const { prodId, catId, title, price, image, description } = req.body;
+
+      // busca no banco de dados a categoria passada pela requisição
+
+      const categoryForId: any = await prisma.category.findFirst({
+        where: { id: catId },
+      });
+
+      // caso o ID do usuário da categoria passada seja igual ao id do login, edita o produto
+
+      if (categoryForId.userId === userId) {
+        const editedProduct = await prisma.product.update({
+          where: {
+            id: prodId,
+          },
+          data: {
+            title,
+            price,
+            image,
+            description,
+          },
+        });
+
+        console.log(editedProduct);
+        return res.status(200).json(editedProduct);
+      }
+    } catch (error) {}
   }
 );
