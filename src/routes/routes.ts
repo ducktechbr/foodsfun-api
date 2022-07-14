@@ -350,6 +350,72 @@ routes.patch(
         console.log(editedProduct);
         return res.status(200).json(editedProduct);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
+  }
+);
+
+routes.patch(
+  "/toggleProduct",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req: any, res) => {
+    try {
+      // retira o loggedinuser da requisição pelo middleware attachCurrentUser
+
+      const loggedInUser = req.auth;
+
+      // retira o userId do loggedInUser
+
+      const userId = loggedInUser.id;
+
+      // testa se o loggedInUser foi encontrado
+
+      if (!loggedInUser) {
+        return res.status(404).json({ msg: "usuário não encontrado" });
+      }
+
+      // criada variável com id do produto e da categoria que vem no body da requisição para delete
+
+      const { prodId, catId } = req.body.data;
+
+      // busca no banco de dados a categoria passada pela requisição
+
+      const categoryForId: any = await prisma.category.findFirst({
+        where: { id: catId },
+      });
+
+      // caso o ID do usuário da categoria passada seja igual ao id do login, faz um toggle no active do produto
+
+      if (categoryForId.userId === userId) {
+        console.log("entrei no primeiro if");
+        const toggleProductInfo = await prisma.product.findUnique({
+          where: { id: prodId },
+        });
+
+        //check se o active está como true, se estiver seta pra false, se estiver como false seta pra true
+
+        if (toggleProductInfo?.active) {
+          const toggleProduct = await prisma.product.update({
+            where: { id: prodId },
+            data: { active: false },
+          });
+          console.log(toggleProduct);
+          return res.status(200).json(toggleProduct);
+        } else {
+          const toggleProduct = await prisma.product.update({
+            where: { id: prodId },
+            data: { active: true },
+          });
+          console.log(toggleProduct);
+          return res.status(200).json(toggleProduct);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
   }
 );
