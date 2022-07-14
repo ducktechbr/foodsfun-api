@@ -191,6 +191,14 @@ routes.get(
   attachCurrentUser,
   async (req: any, res: any) => {
     try {
+      const loggedInUser = req.auth;
+      const userId = loggedInUser.id;
+      if (!loggedInUser) {
+        return res.status(404).json({ msg: "usuário não encontrado" });
+      }
+      const userCategories = await prisma.category.findMany({
+        where: { userId },
+      });
       console.log(userCategories);
       return res.status(200).json(userCategories);
     } catch (error) {
@@ -204,16 +212,39 @@ routes.get(
   "/getProducts/:category",
   isAuthenticated,
   attachCurrentUser,
-  async (req, res) => {
+  async (req: any, res) => {
     try {
+      // retira a categoria dos parametros da url
       const category: any = req.params.category;
+
+      // retira o loggedinuser da requisição pelo middleware attachCurrentUser
+
+      const loggedInUser = req.auth;
+
+      // retira o userId do loggedInUser
+
+      const userId = loggedInUser.id;
+
+      // testa se o loggedInUser foi encontrado
+
+      if (!loggedInUser) {
+        return res.status(404).json({ msg: "usuário não encontrado" });
+      }
+
+      // caso o loggedinuser exista, carrega a primeira categoria onde o userId é igual o id do usuário logado, e o título da categoria é igual o título passado como params
+
       const categoryForId = await prisma.category.findFirst({
-        where: { title: category },
+        where: { userId, title: category },
       });
+
+      // retira o id da categoria carregada e pesquisa todos os produtos dessa categoria
+
       const categoryId = categoryForId?.id;
+
       const categoryProducts = await prisma.product.findMany({
         where: { categoryId: categoryId },
       });
+      
       console.log(categoryProducts);
       return res.status(200).json(categoryProducts);
     } catch (error) {
