@@ -191,14 +191,6 @@ routes.get(
   attachCurrentUser,
   async (req: any, res: any) => {
     try {
-      const loggedInUser = req.auth;
-      const userId = loggedInUser.id;
-      if (!loggedInUser) {
-        return res.status(404).json({ msg: "usuário não encontrado" });
-      }
-      const userCategories = await prisma.category.findMany({
-        where: { userId },
-      });
       console.log(userCategories);
       return res.status(200).json(userCategories);
     } catch (error) {
@@ -208,20 +200,25 @@ routes.get(
   }
 );
 
-routes.get("/getProducts/:category", async (req, res) => {
-  try {
-    const category: any = req.params.category;
-    const categoryForId = await prisma.category.findFirst({
-      where: { title: category },
-    });
-    const categoryId = categoryForId?.id;
-    const categoryProducts = await prisma.product.findMany({
-      where: { categoryId: categoryId },
-    });
-    console.log(categoryProducts);
-    return res.status(200).json(categoryProducts);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json(error);
+routes.get(
+  "/getProducts/:category",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const category: any = req.params.category;
+      const categoryForId = await prisma.category.findFirst({
+        where: { title: category },
+      });
+      const categoryId = categoryForId?.id;
+      const categoryProducts = await prisma.product.findMany({
+        where: { categoryId: categoryId },
+      });
+      console.log(categoryProducts);
+      return res.status(200).json(categoryProducts);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
   }
-});
+);
