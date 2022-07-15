@@ -328,12 +328,13 @@ routes.patch(
 
       // busca no banco de dados a categoria passada pela requisição
 
+      console.log(req.body);
       const categoryForId: any = await prisma.category.findFirst({
         where: { id: catId },
       });
 
       // caso o ID do usuário da categoria passada seja igual ao id do login, edita o produto
-
+      console.log("cheguei aqui");
       if (categoryForId.userId === userId) {
         const editedProduct = await prisma.product.update({
           where: {
