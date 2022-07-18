@@ -279,25 +279,170 @@ exports.routes.get("/getCategory", isAuthenticated, attachCurrentUser, function 
         }
     });
 }); });
-exports.routes.get("/getProducts/:id", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var categoryId, categoryProducts, error_6;
+exports.routes.get("/getProducts/:category", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var category, loggedInUser, userId, categoryForId, categoryId, categoryProducts, error_6;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                categoryId = req.params.id;
+                _a.trys.push([0, 3, , 4]);
+                category = req.params.category;
+                loggedInUser = req.auth;
+                userId = loggedInUser.id;
+                // testa se o loggedInUser foi encontrado
+                if (!loggedInUser) {
+                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                }
+                return [4 /*yield*/, prisma_1.prisma.category.findFirst({
+                        where: { userId: userId, title: category }
+                    })];
+            case 1:
+                categoryForId = _a.sent();
+                categoryId = categoryForId === null || categoryForId === void 0 ? void 0 : categoryForId.id;
                 return [4 /*yield*/, prisma_1.prisma.product.findMany({
                         where: { categoryId: categoryId }
                     })];
-            case 1:
+            case 2:
                 categoryProducts = _a.sent();
                 console.log(categoryProducts);
                 return [2 /*return*/, res.status(200).json(categoryProducts)];
-            case 2:
+            case 3:
                 error_6 = _a.sent();
                 console.error(error_6);
                 return [2 /*return*/, res.status(500).json(error_6)];
-            case 3: return [2 /*return*/];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); });
+exports.routes["delete"]("/deleteProduct", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var loggedInUser, userId, _a, prodId, catId, categoryForId, deletedProduct, error_7;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 4, , 5]);
+                loggedInUser = req.auth;
+                userId = loggedInUser.id;
+                // testa se o loggedInUser foi encontrado
+                if (!loggedInUser) {
+                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                }
+                _a = req.body, prodId = _a.prodId, catId = _a.catId;
+                return [4 /*yield*/, prisma_1.prisma.category.findFirst({
+                        where: { id: catId }
+                    })];
+            case 1:
+                categoryForId = _b.sent();
+                if (!(categoryForId.userId === userId)) return [3 /*break*/, 3];
+                return [4 /*yield*/, prisma_1.prisma.product["delete"]({
+                        where: { id: prodId }
+                    })];
+            case 2:
+                deletedProduct = _b.sent();
+                console.log(deletedProduct);
+                return [2 /*return*/, res.status(200).json(deletedProduct)];
+            case 3: return [3 /*break*/, 5];
+            case 4:
+                error_7 = _b.sent();
+                console.error(error_7);
+                return [2 /*return*/, res.status(500).json(error_7)];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); });
+exports.routes.patch("/editProduct", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var loggedInUser, userId, _a, prodId, catId, title, price, image, description, categoryForId, editedProduct, error_8;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 4, , 5]);
+                loggedInUser = req.auth;
+                userId = loggedInUser.id;
+                // testa se o loggedInUser foi encontrado
+                if (!loggedInUser) {
+                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                }
+                _a = req.body, prodId = _a.prodId, catId = _a.catId, title = _a.title, price = _a.price, image = _a.image, description = _a.description;
+                // busca no banco de dados a categoria passada pela requisição
+                console.log(req.body);
+                return [4 /*yield*/, prisma_1.prisma.category.findFirst({
+                        where: { id: catId }
+                    })];
+            case 1:
+                categoryForId = _b.sent();
+                // caso o ID do usuário da categoria passada seja igual ao id do login, edita o produto
+                console.log("cheguei aqui");
+                if (!(categoryForId.userId === userId)) return [3 /*break*/, 3];
+                return [4 /*yield*/, prisma_1.prisma.product.update({
+                        where: {
+                            id: prodId
+                        },
+                        data: {
+                            title: title,
+                            price: price,
+                            image: image,
+                            description: description
+                        }
+                    })];
+            case 2:
+                editedProduct = _b.sent();
+                console.log(editedProduct);
+                return [2 /*return*/, res.status(200).json(editedProduct)];
+            case 3: return [3 /*break*/, 5];
+            case 4:
+                error_8 = _b.sent();
+                console.error(error_8);
+                return [2 /*return*/, res.status(500).json(error_8)];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); });
+exports.routes.patch("/toggleProduct", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var loggedInUser, userId, _a, prodId, catId, categoryForId, toggleProductInfo, toggleProduct, toggleProduct, error_9;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 7, , 8]);
+                loggedInUser = req.auth;
+                userId = loggedInUser.id;
+                // testa se o loggedInUser foi encontrado
+                if (!loggedInUser) {
+                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                }
+                _a = req.body.data, prodId = _a.prodId, catId = _a.catId;
+                return [4 /*yield*/, prisma_1.prisma.category.findFirst({
+                        where: { id: catId }
+                    })];
+            case 1:
+                categoryForId = _b.sent();
+                if (!(categoryForId.userId === userId)) return [3 /*break*/, 6];
+                console.log("entrei no primeiro if");
+                return [4 /*yield*/, prisma_1.prisma.product.findUnique({
+                        where: { id: prodId }
+                    })];
+            case 2:
+                toggleProductInfo = _b.sent();
+                if (!(toggleProductInfo === null || toggleProductInfo === void 0 ? void 0 : toggleProductInfo.active)) return [3 /*break*/, 4];
+                return [4 /*yield*/, prisma_1.prisma.product.update({
+                        where: { id: prodId },
+                        data: { active: false }
+                    })];
+            case 3:
+                toggleProduct = _b.sent();
+                console.log(toggleProduct);
+                return [2 /*return*/, res.status(200).json(toggleProduct)];
+            case 4: return [4 /*yield*/, prisma_1.prisma.product.update({
+                    where: { id: prodId },
+                    data: { active: true }
+                })];
+            case 5:
+                toggleProduct = _b.sent();
+                console.log(toggleProduct);
+                return [2 /*return*/, res.status(200).json(toggleProduct)];
+            case 6: return [3 /*break*/, 8];
+            case 7:
+                error_9 = _b.sent();
+                console.error(error_9);
+                return [2 /*return*/, res.status(500).json(error_9)];
+            case 8: return [2 /*return*/];
         }
     });
 }); });

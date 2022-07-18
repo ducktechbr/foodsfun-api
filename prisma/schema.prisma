@@ -28,12 +28,23 @@ model Category {
 }
 
 model Product {
-   id String    @id @default(auto()) @map("_id") @db.ObjectId
-   title    String
-   price String
-   image String?
+  id String    @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  price String
+  image String?
   description String
   active Boolean @default(true)
   category Category @relation(fields: [categoryId],references:[id])
   categoryId String @db.ObjectId
+}
+
+model Orders {
+  id String    @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  quantity Int
+  info     String?
+  date     DateTime?
+  active   Boolean @default(true)
+  // mesa
+  // mesa id
 }
