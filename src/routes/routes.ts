@@ -1,6 +1,7 @@
 import { prisma } from '../config/prisma';
 const generateToken = require('../config/jwt.config');
 import express, { Router } from 'express';
+import { Prisma } from '@prisma/client';
 const bcrypt = require('bcrypt');
 const isAuthenticated = require('../middlewares/isAuthenticated');
 const attachCurrentUser = require('../middlewares/attachCurrentUser');
@@ -22,11 +23,18 @@ routes.post('/newUser', async (req, res) => {
 		}
 		const salt = await bcrypt.genSalt(saltRounds);
 		const hashedPassword: string = await bcrypt.hash(password, salt);
+		var paymentMethod = {
+			pix: true,
+			cartao: true,
+			dinheiro: true,
+		} as Prisma.JsonObject;
+
 		const NewUser = await prisma.user.create({
 			data: {
 				userName,
 				email,
 				passwordHash: hashedPassword,
+				paymentMethod,
 			},
 		});
 
@@ -79,8 +87,13 @@ routes.get(
 			if (!loggedInUser) {
 				return res.status(404).json({ msg: 'usuário não encontrado' });
 			}
-			console.log(req.auth);
-			return res.status(200).json(req.auth);
+			console.log(loggedInUser);
+			var user = await prisma.user.findUnique({
+				where: { id: loggedInUser.id },
+			});
+			user?.passwordHash = '';
+			console.log(user);
+			return res.status(200).json(user);
 		} catch (error) {
 			console.error(error);
 			return res.status(500).json(error);
@@ -146,44 +159,107 @@ routes.post('/newProduct', async (req, res) => {
 	}
 });
 
-// routes.patch(
-//   "/editUser",
-//   isAuthenticated,
-//   attachCurrentUser,
-//   async (req: any, res: any) => {
-//     try {
-//       const { userName, email, id } = req.auth;
-//       const { password } = req.body;
-//       if (
-//         !password ||
-//         !password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)
-//       ) {
-//         return res.status(400).json({
-//           msg: "Password is required and must have at least 6 characters, at least one letter and one number, and no simbols",
-//         });
-//       }
-//       const salt = await bcrypt.genSalt(saltRounds);
-//       const hashedPassword = await bcrypt.hash(password, salt);
-//       const edittedUser = await prisma.user.update({
-//         where: { id },
-//         data: { userName, email, passwordHash: hashedPassword },
-//       });
-//       console.log(edittedUser);
-//       return res.status(201).json(edittedUser);
-//     } catch (error) {
-//       let erroDuplicatedUser = JSON.stringify(error);
-//       erroDuplicatedUser = JSON.parse(erroDuplicatedUser).code;
+routes.patch(
+	'/togglePaymentMethod',
+	isAuthenticated,
+	attachCurrentUser,
+	async (req: any, res: any) => {
+		try {
+			const { id } = req.auth;
 
-//       if (erroDuplicatedUser == "P2002") {
-//         return res
-//           .status(500)
-//           .json({ erro: "Usuário ou número de telefone duplicado" });
-//       } else {
-//         return res.status(500).json(error);
-//       }
-//     }
-//   }
-// );
+			const { payment } = req.body;
+
+			const user = await prisma.user.findUnique({
+				where: { id },
+			});
+
+			console.log(user);
+			if (payment === 'pix') {
+				console.log('entrei no if do pix');
+				if (user.paymentMethod.pix) {
+					const edittedUser = await prisma.user.update({
+						where: { id },
+						data: {
+							paymentMethod: {
+								...user.paymentMethod,
+								pix: false,
+							},
+						},
+					});
+					console.log(edittedUser);
+					return res.status(200).json(edittedUser);
+				} else {
+					const edittedUser = await prisma.user.update({
+						where: { id },
+						data: {
+							paymentMethod: { ...user.paymentMethod, pix: true },
+						},
+					});
+					console.log(edittedUser);
+					return res.status(200).json(edittedUser);
+				}
+			}
+
+			if (payment === 'cartao') {
+				if (user.paymentMethod.cartao) {
+					const edittedUser = await prisma.user.update({
+						where: { id },
+						data: {
+							paymentMethod: {
+								...user.paymentMethod,
+								cartao: false,
+							},
+						},
+					});
+					console.log(edittedUser);
+					return res.status(200).json(edittedUser);
+				} else {
+					const edittedUser = await prisma.user.update({
+						where: { id },
+						data: {
+							paymentMethod: {
+								...user.paymentMethod,
+								cartao: true,
+							},
+						},
+					});
+					console.log(edittedUser);
+					return res.status(200).json(edittedUser);
+				}
+			}
+
+			if (payment === 'dinheiro') {
+				if (user.paymentMethod.dinheiro) {
+					const edittedUser = await prisma.user.update({
+						where: { id },
+						data: {
+							paymentMethod: {
+								...user.paymentMethod,
+								dinheiro: false,
+							},
+						},
+					});
+					console.log(edittedUser);
+					return res.status(200).json(edittedUser);
+				} else {
+					const edittedUser = await prisma.user.update({
+						where: { id },
+						data: {
+							paymentMethod: {
+								...user.paymentMethod,
+								dinheiro: true,
+							},
+						},
+					});
+					console.log(edittedUser);
+					return res.status(200).json(edittedUser);
+				}
+			}
+		} catch (error) {
+			return res.status(500).json(error);
+		}
+	}
+);
 
 routes.get(
 	'/getCategory',

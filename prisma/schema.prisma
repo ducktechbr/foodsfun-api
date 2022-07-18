@@ -13,6 +13,8 @@ model User {
   userName String @unique
   email String @unique
   passwordHash String
+  paymentMethod Json?
+  bannerImage String?
   catogories Category[]
   isDisabled Boolean @default(false)
   disabledWhen DateTime? 
