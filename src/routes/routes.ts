@@ -2,6 +2,7 @@ import { prisma } from "../config/prisma";
 const generateToken = require("../config/jwt.config");
 import express from "express";
 import { Prisma } from "@prisma/client";
+import { info } from "console";
 const bcrypt = require("bcrypt");
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const attachCurrentUser = require("../middlewares/attachCurrentUser");
@@ -9,6 +10,8 @@ const attachCurrentUser = require("../middlewares/attachCurrentUser");
 const saltRounds = 10;
 
 export const routes = express.Router();
+
+// rotas de usuário
 
 routes.post("/newUser", async (req, res) => {
   try {
@@ -100,64 +103,6 @@ routes.get(
     }
   }
 );
-
-routes.post(
-  "/newCategory",
-  isAuthenticated,
-  attachCurrentUser,
-  async (req: any, res: any) => {
-    try {
-      const loggedInUser = req.auth;
-      const userId = loggedInUser.id;
-      if (!loggedInUser) {
-        return res.status(404).json({ msg: "usuário não encontrado" });
-      }
-      const { title, description } = req.body;
-
-      const post = await prisma.category.create({
-        data: {
-          title,
-          description,
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-        },
-      });
-      console.log(post);
-      return res.status(201).json(post);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json(error);
-    }
-  }
-);
-
-routes.post("/newProduct", async (req, res) => {
-  try {
-    const { title, price, description, image, category } = req.body;
-    const data: any = {
-      title,
-      price,
-      description,
-      image,
-      category: {
-        connect: {
-          id: category,
-        },
-      },
-    };
-    const newProduct = await prisma.product.create({
-      data,
-    });
-    console.log(newProduct);
-    return res.status(201).json(newProduct);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json(error);
-  }
-});
 
 routes.patch(
   "/togglePaymentMethod",
@@ -260,6 +205,41 @@ routes.patch(
   }
 );
 
+// rotas de categorias
+
+routes.post(
+  "/newCategory",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req: any, res: any) => {
+    try {
+      const loggedInUser = req.auth;
+      const userId = loggedInUser.id;
+      if (!loggedInUser) {
+        return res.status(404).json({ msg: "usuário não encontrado" });
+      }
+      const { title, description } = req.body;
+
+      const post = await prisma.category.create({
+        data: {
+          title,
+          description,
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      });
+      console.log(post);
+      return res.status(201).json(post);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
+  }
+);
+
 routes.get(
   "/getCategory",
   isAuthenticated,
@@ -282,6 +262,67 @@ routes.get(
     }
   }
 );
+
+routes.delete(
+  "/deleteCategory",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req: any, res: any) => {
+    try {
+      const loggedInUser = req.auth;
+      const userId = loggedInUser.id;
+
+      const { categoryId } = req.body;
+
+      if (!loggedInUser) {
+        return res.status(404).json({ msg: "usuário não encontrado" });
+      }
+
+      const categoryForId = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+      if (categoryForId.userId === userId) {
+        const category = await prisma.category.delete({
+          where: { id: categoryId },
+        });
+        console.log(category);
+        return res.status(200).json(category);
+      }
+      console.log("user não é dono da categoria")
+      return res.status(500).json({"msg":"user não é dono da categoria"})
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
+  }
+);
+
+// rotas de produto
+
+routes.post("/newProduct", async (req, res) => {
+  try {
+    const { title, price, description, image, category } = req.body;
+    const data: any = {
+      title,
+      price,
+      description,
+      image,
+      category: {
+        connect: {
+          id: category,
+        },
+      },
+    };
+    const newProduct = await prisma.product.create({
+      data,
+    });
+    console.log(newProduct);
+    return res.status(201).json(newProduct);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(error);
+  }
+});
 
 routes.get(
   "/getProducts/:category",
@@ -496,15 +537,18 @@ routes.patch(
   }
 );
 
+// rotas de pedidos
+
 routes.post("/newOrder", async (req, res) => {
   try {
-    const { title, info, quantity } = req.body.data;
+    const { title, info, quantity, tableId } = req.body.data;
     const date = new Date(Date.now());
     const data: any = {
       title,
       info,
       quantity,
       date,
+      tableId,
     };
     const createdOrder = await prisma.orders.create({ data });
     console.log(createdOrder);
@@ -517,32 +561,71 @@ routes.post("/newOrder", async (req, res) => {
 
 routes.get(
   "/getOrders",
-  // isAuthenticated,
-  // attachCurrentUser,
+  isAuthenticated,
+  attachCurrentUser,
   async (req: any, res) => {
     try {
       // retira o loggedinuser da requisição pelo middleware attachCurrentUser
 
-      // const loggedInUser = req.auth;
+      const loggedInUser = req.auth;
 
       // retira o userId do loggedInUser
 
-      // const userId = loggedInUser.id;
+      const userId = loggedInUser.id;
 
-      // testa se o loggedInUser foi encontrado
+      const tables = await prisma.table.findMany({ where: { userId } });
 
-      const orders = await prisma.orders.findMany({
-        where: {},
+      var orders = [];
+      var map = tables.map(async (current) => {
+        var newOrders = await prisma.orders.findMany({
+          where: { tableId: current.id },
+        });
+        return newOrders;
       });
 
-      console.log(orders);
-      return res.status(200).json(orders);
+      Promise.allSettled(map).then((results) => {
+        results.forEach((result) => {
+          result.value.map((current) => {
+            orders.push(current);
+          });
+        });
+
+        if (orders.length === 0) {
+          return res
+            .status(200)
+            .json({ msg: "Usuário não tem pedidos ativos." });
+        }
+        console.log(orders);
+        return res.status(200).json(orders);
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json(error);
     }
   }
 );
+
+routes.patch(
+  "/toggleOrder",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req: any, res) => {
+    try {
+      // retira o loggedinuser da requisição pelo middleware attachCurrentUser
+
+      const loggedInUser = req.auth;
+
+      // retira o userId do loggedInUser
+
+      const userId = loggedInUser.id;
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json(error);
+    }
+  }
+);
+
+// rotas de mesa
 
 routes.post(
   "/newTable",
@@ -672,6 +755,7 @@ routes.delete(
     }
   }
 );
+
 routes.patch(
   "/toggleTable",
   isAuthenticated,
