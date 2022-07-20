@@ -584,7 +584,7 @@ routes.get(
       });
 
       Promise.allSettled(map).then((results) => {
-        results.forEach((result) => {
+        results.forEach((result:any) => {
           result.value.map((current) => {
             orders.push(current);
           });
