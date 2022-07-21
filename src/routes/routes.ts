@@ -288,8 +288,8 @@ routes.delete(
         console.log(category);
         return res.status(200).json(category);
       }
-      console.log("user não é dono da categoria")
-      return res.status(500).json({"msg":"user não é dono da categoria"})
+      console.log("user não é dono da categoria");
+      return res.status(500).json({ msg: "user não é dono da categoria" });
     } catch (error) {
       console.error(error);
       return res.status(500).json(error);
@@ -356,6 +356,10 @@ routes.get(
       // retira o id da categoria carregada e pesquisa todos os produtos dessa categoria
 
       const categoryId = categoryForId?.id;
+
+      if (categoryId === undefined) {
+        return res.status(404).json({ msg: "categoria não encontrada" });
+      }
 
       const categoryProducts = await prisma.product.findMany({
         where: { categoryId: categoryId },
@@ -584,7 +588,7 @@ routes.get(
       });
 
       Promise.allSettled(map).then((results) => {
-        results.forEach((result:any) => {
+        results.forEach((result: any) => {
           result.value.map((current) => {
             orders.push(current);
           });
