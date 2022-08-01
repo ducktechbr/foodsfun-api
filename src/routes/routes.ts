@@ -908,7 +908,6 @@ routes.post('/loginClient', async (req, res) => {
 
 routes.patch('/categoriesClient', async (req, res) => {
 	try {
-		console.log(req.body);
 		const { id } = req.body;
 		const table = await prisma.table.findUnique({
 			where: { id },
@@ -919,6 +918,42 @@ routes.patch('/categoriesClient', async (req, res) => {
 		});
 		console.log(userCategories);
 		return res.status(200).json(userCategories);
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json(error);
+	}
+});
+
+routes.patch('/getProductsClient/:category', async (req: any, res) => {
+	try {
+		// retira a categoria dos parametros da url
+		const category: any = req.params.category;
+
+		const { id } = req.body;
+		const table = await prisma.table.findUnique({
+			where: { id },
+		});
+
+		const userId = table.userId;
+
+		const categoryForId = await prisma.category.findFirst({
+			where: { userId, title: category },
+		});
+
+		// retira o id da categoria carregada e pesquisa todos os produtos dessa categoria
+
+		const categoryId = categoryForId?.id;
+
+		if (categoryId === undefined) {
+			return res.status(404).json({ msg: 'categoria não encontrada' });
+		}
+
+		const categoryProducts = await prisma.product.findMany({
+			where: { categoryId: categoryId },
+		});
+
+		console.log(categoryProducts);
+		return res.status(200).json(categoryProducts);
 	} catch (error) {
 		console.error(error);
 		return res.status(500).json(error);
