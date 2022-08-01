@@ -55,17 +55,19 @@ model Orders {
 }
 
 model Table {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
-  number Int      
-  active Boolean  @default(true)
-  orders Orders[]
-  user   User     @relation(fields: [userId], references: [id])
-  userId String   @db.ObjectId
-  qrcode String
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  number   Int      
+  active   Boolean  @default(true)
+  orders   Orders[]
+  user     User     @relation(fields: [userId], references: [id])
+  userId   String   @db.ObjectId
+  qrcode   String
 }
 
 model   Client {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
-  email  String
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  number  String   @unique
   orders Orders[]
 }
+

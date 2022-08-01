@@ -2,7 +2,6 @@ import { prisma } from '../config/prisma';
 const generateToken = require('../config/jwt.config');
 import express from 'express';
 import { Prisma } from '@prisma/client';
-import { info } from 'console';
 const bcrypt = require('bcrypt');
 const isAuthenticated = require('../middlewares/isAuthenticated');
 const attachCurrentUser = require('../middlewares/attachCurrentUser');
@@ -652,9 +651,6 @@ routes.patch(
 			// retira o loggedinuser da requisição pelo middleware attachCurrentUser
 
 			const { id } = req.body;
-
-      
-
 		} catch (error) {
 			console.error(error);
 			return res.status(500).json(error);
@@ -878,3 +874,31 @@ routes.get(
 		}
 	}
 );
+
+// routes de cliente
+
+routes.post('/loginClient', async (req, res) => {
+	try {
+		const { name, number } = req.body;
+
+		const user = await prisma.client.findUnique({ where: { number } });
+
+		if (user !== null) {
+			if (user.name === name) {
+				return res.status(200).json({ msg: 'usuário logado' });
+			}
+			else{
+				return res.status(500).json({ msg: 'nome de usuário incorreto'})
+			}
+		} else {
+			const newClient = await prisma.client.create({
+				data: { name, number },
+			});
+
+			return res.status(200).json(newClient);
+		}
+	} catch (error) {
+		console.error(error.code);
+		return res.status(500).json(error);
+	}
+});
