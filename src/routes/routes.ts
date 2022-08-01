@@ -886,9 +886,10 @@ routes.post('/loginClient', async (req, res) => {
 		if (user !== null) {
 			if (user.name === name) {
 				return res.status(200).json({ msg: 'usuário logado' });
-			}
-			else{
-				return res.status(500).json({ msg: 'nome de usuário incorreto'})
+			} else {
+				return res
+					.status(500)
+					.json({ msg: 'nome de usuário incorreto' });
 			}
 		} else {
 			const newClient = await prisma.client.create({
@@ -899,6 +900,27 @@ routes.post('/loginClient', async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error.code);
+		return res.status(500).json(error);
+	}
+});
+
+// get produtos pelo cliente
+
+routes.patch('/categoriesClient', async (req, res) => {
+	try {
+		console.log(req.body);
+		const { id } = req.body;
+		const table = await prisma.table.findUnique({
+			where: { id },
+		});
+		const userId = table.userId;
+		const userCategories = await prisma.category.findMany({
+			where: { userId },
+		});
+		console.log(userCategories);
+		return res.status(200).json(userCategories);
+	} catch (error) {
+		console.error(error);
 		return res.status(500).json(error);
 	}
 });
