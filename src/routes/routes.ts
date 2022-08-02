@@ -1,6 +1,6 @@
 import { prisma } from '../config/prisma';
 const generateToken = require('../config/jwt.config');
-import express from 'express';
+import express, { Router } from 'express';
 import { Prisma } from '@prisma/client';
 const bcrypt = require('bcrypt');
 const isAuthenticated = require('../middlewares/isAuthenticated');
@@ -11,6 +11,13 @@ const saltRounds = 10;
 export const routes = express.Router();
 
 // rotas de usuário
+routes.get('/healthcheck', async (req, res) => {
+	if (req.method === 'GET') {
+		res.status(200).json({message: 'Healthy'});
+	} else {
+		res.status(400).json({message: 'Method not allowed'});
+	}
+});
 
 routes.post('/newUser', async (req, res) => {
 	try {
