@@ -48,26 +48,32 @@ model Orders {
   info     String?
   date     DateTime?
   active   Boolean   @default(true)
-  table    Table?     @relation(fields: [tableId], references: [id])
-  tableId  String?    @db.ObjectId
+  table    Table?    @relation(fields: [tableId], references: [id])
+  tableId  String?   @db.ObjectId
   client   Client?   @relation(fields: [clientId], references: [id])
   clientId String?   @db.ObjectId
+  check    Check?    @relation(fields: [checkId], references: [id])
+  checkId  String?   @db.ObjectId
 }
 
 model Table {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  number   Int      
-  active   Boolean  @default(true)
-  orders   Orders[]
-  user     User     @relation(fields: [userId], references: [id])
-  userId   String   @db.ObjectId
-  qrcode   String
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  number Int
+  active Boolean  @default(true)
+  orders Orders[]
+  user   User     @relation(fields: [userId], references: [id])
+  userId String   @db.ObjectId
+  qrcode String
 }
 
-model   Client {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  name    String
-  number  String   @unique
+model Client {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  number String   @unique
   orders Orders[]
 }
 
+model Check {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  orders Orders[]
+}
