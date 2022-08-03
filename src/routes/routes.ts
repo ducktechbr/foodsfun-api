@@ -607,7 +607,7 @@ routes.post("/newOrder", async (req, res) => {
   }
 });
 
-routes.get(
+routes.patch(
   "/getOrders",
   isAuthenticated,
   attachCurrentUser,
