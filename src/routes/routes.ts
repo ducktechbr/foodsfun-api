@@ -554,6 +554,11 @@ routes.post("/newOrder", async (req, res) => {
     const { title, info, quantity, tableId, clientId, productId } =
       req.body.data;
 
+    if (clientId === undefined) {
+      console.log("CLIENT ID UNDEFINED");
+      return res.status(500).json({ msg: "CLIENT ID UNDEFINED" });
+    }
+
     const orderTable = await prisma.table.findFirst({
       where: { id: tableId },
     });
@@ -973,7 +978,13 @@ routes.get("/getCheck", async (req, res) => {
 
 routes.post("/newOrderOnExistingCheck", async (req, res) => {
   try {
-    const { title, info, quantity, tableId, checkId, clientId, productId } = req.body.data;
+    const { title, info, quantity, tableId, checkId, clientId, productId } =
+      req.body.data;
+
+    if (clientId === undefined) {
+      console.log("CLIENT ID UNDEFINED");
+      return res.status(500).json({ msg: "CLIENT ID UNDEFINED" });
+    }
 
     const orderTable = await prisma.table.findFirst({
       where: { id: tableId },
@@ -1008,7 +1019,7 @@ routes.post("/newOrderOnExistingCheck", async (req, res) => {
         tableId,
         number,
         clientId,
-        productId
+        productId,
       };
       const createdOrder = prisma.check
         .update({
