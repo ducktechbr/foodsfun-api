@@ -1036,3 +1036,25 @@ routes.post("/newOrderOnExistingCheck", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+routes.patch("/toggleCheck", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const check = await prisma.check.update({
+      where: { id },
+      data: { isDisabled: true },
+    });
+
+    const orders = await prisma.orders.updateMany({
+      where: { checkId: id },
+      data: { active: true },
+    });
+
+    console.log(check,orders)
+    return res.status(200).json(orders)
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(error);
+  }
+});
