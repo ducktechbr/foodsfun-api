@@ -607,7 +607,7 @@ routes.post("/newOrder", async (req, res) => {
   }
 });
 
-routes.patch(
+routes.get(
   "/getOrders",
   isAuthenticated,
   attachCurrentUser,
@@ -962,7 +962,7 @@ routes.patch("/getProductsClient/:category", async (req: any, res) => {
   }
 });
 
-routes.get("/getCheck", async (req, res) => {
+routes.patch("/getCheck", async (req, res) => {
   try {
     const { id } = req.body;
     const check = await prisma.check.findUnique({
