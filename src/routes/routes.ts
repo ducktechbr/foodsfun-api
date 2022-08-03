@@ -551,7 +551,7 @@ routes.patch(
 
 routes.post("/newOrder", async (req, res) => {
   try {
-    const { title, info, quantity, tableId } = req.body.data;
+    const { title, info, quantity, tableId, clientId } = req.body.data;
 
     const orderTable = await prisma.table.findFirst({
       where: { id: tableId },
@@ -585,6 +585,7 @@ routes.post("/newOrder", async (req, res) => {
         date,
         tableId,
         number,
+        clientId,
       };
       const createdOrder = prisma.check
         .create({ data: { orders: { create: [data] } } })
@@ -970,7 +971,7 @@ routes.get("/getCheck", async (req, res) => {
 
 routes.post("/newOrderOnExistingCheck", async (req, res) => {
   try {
-    const { title, info, quantity, tableId, checkId } = req.body.data;
+    const { title, info, quantity, tableId, checkId, clientId } = req.body.data;
 
     const orderTable = await prisma.table.findFirst({
       where: { id: tableId },
@@ -1004,9 +1005,13 @@ routes.post("/newOrderOnExistingCheck", async (req, res) => {
         date,
         tableId,
         number,
+        clientId,
       };
       const createdOrder = prisma.check
-        .update({where:{id:checkId}, data: { orders: { create: [data] } } })
+        .update({
+          where: { id: checkId },
+          data: { orders: { create: [data] } },
+        })
         .then((result) => {
           console.log(result);
           return res.status(200).json(result);
