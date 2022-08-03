@@ -77,6 +77,8 @@ model Client {
 }
 
 model Check {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
-  orders Orders[]
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  isDisabled Boolean  @default(false)
+  isPaid     Boolean  @default(false)
+  orders     Orders[]
 }

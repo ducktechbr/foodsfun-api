@@ -1025,14 +1025,3 @@ routes.post("/newOrderOnExistingCheck", async (req, res) => {
     return res.status(500).json(error);
   }
 });
-
-// routes.patch("/editCheck",async (req,res) => {
-//   try {
-//     const id = req.body
-//     const order = req.body
-//     const newCheck = await prisma.check.update({where: {id},data:{orders:}})
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json(error);
-//   }
-// })
