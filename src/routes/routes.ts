@@ -1095,3 +1095,15 @@ routes.patch('/getChecksByClientId', async (req, res) => {
 		return res.status(500).json(error);
 	}
 });
+
+routes.get('/getProductsById/:id', async (req, res) => {
+	try {
+		const id: any = req.params.id;
+		const product = await prisma.product.findFirst({ where: { id } });
+		console.log(product);
+		return res.status(200).json(product);
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json(error);
+	}
+});
