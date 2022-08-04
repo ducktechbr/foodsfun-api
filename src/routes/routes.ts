@@ -1080,3 +1080,18 @@ routes.patch('/toggleCheck', async (req, res) => {
 		return res.status(500).json(error);
 	}
 });
+
+routes.patch('/getChecksByClientId', async (req, res) => {
+  try {
+		const { clientId } = req.body;
+		const checks = await prisma.check.findMany({
+			where: { clientId },
+			include: { orders: true },
+		});
+    console.log(checks)
+		return res.status(200).json(checks;
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json(error);
+	}
+})
