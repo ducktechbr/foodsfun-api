@@ -74,11 +74,14 @@ model Client {
   name   String
   number String   @unique
   orders Orders[]
+  Check  Check[]
 }
 
 model Check {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   isDisabled Boolean  @default(false)
   isPaid     Boolean  @default(false)
+  client     Client   @relation(fields: [clientId], references: [id])
+  clientId   String   @db.ObjectId
   orders     Orders[]
 }
