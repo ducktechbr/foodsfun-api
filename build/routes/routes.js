@@ -52,26 +52,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 exports.routes = void 0;
 var prisma_1 = require("../config/prisma");
-var generateToken = require("../config/jwt.config");
+var generateToken = require('../config/jwt.config');
 var express_1 = __importDefault(require("express"));
-var bcrypt = require("bcrypt");
-var isAuthenticated = require("../middlewares/isAuthenticated");
-var attachCurrentUser = require("../middlewares/attachCurrentUser");
+var bcrypt = require('bcrypt');
+var isAuthenticated = require('../middlewares/isAuthenticated');
+var attachCurrentUser = require('../middlewares/attachCurrentUser');
 var saltRounds = 10;
 exports.routes = express_1["default"].Router();
 // rotas de usuário
-exports.routes.get("/healthcheck", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.get('/healthcheck', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        if (req.method === "GET") {
-            res.status(200).json({ message: "Healthy" });
+        if (req.method === 'GET') {
+            res.status(200).json({ message: 'Healthy' });
         }
         else {
-            res.status(400).json({ message: "Method not allowed" });
+            res.status(400).json({ message: 'Method not allowed' });
         }
         return [2 /*return*/];
     });
 }); });
-exports.routes.post("/newUser", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.post('/newUser', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, userName, email, password, salt, hashedPassword, paymentMethod, NewUser, response, error_1, erroDuplicatedUser;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -81,7 +81,7 @@ exports.routes.post("/newUser", function (req, res) { return __awaiter(void 0, v
                 if (!password ||
                     !password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
                     return [2 /*return*/, res.status(400).json({
-                            msg: "Password is required and must have at least 6 characters, at least one letter and one number, and no simbols"
+                            msg: 'Password is required and must have at least 6 characters, at least one letter and one number, and no simbols'
                         })];
                 }
                 return [4 /*yield*/, bcrypt.genSalt(saltRounds)];
@@ -106,17 +106,17 @@ exports.routes.post("/newUser", function (req, res) { return __awaiter(void 0, v
             case 3:
                 NewUser = _b.sent();
                 response = NewUser;
-                response.passwordHash = "";
+                response.passwordHash = '';
                 console.log(response);
                 return [2 /*return*/, res.status(201).json(response)];
             case 4:
                 error_1 = _b.sent();
                 erroDuplicatedUser = JSON.stringify(error_1);
                 erroDuplicatedUser = JSON.parse(erroDuplicatedUser).code;
-                if (erroDuplicatedUser == "P2002") {
+                if (erroDuplicatedUser == 'P2002') {
                     return [2 /*return*/, res
                             .status(500)
-                            .json({ erro: "Usuário ou número de telefone duplicado" })];
+                            .json({ erro: 'Usuário ou número de telefone duplicado' })];
                 }
                 else {
                     return [2 /*return*/, res.status(500).json(error_1)];
@@ -126,7 +126,7 @@ exports.routes.post("/newUser", function (req, res) { return __awaiter(void 0, v
         }
     });
 }); });
-exports.routes.post("/login", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, email, password, user, token, error_2;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -137,7 +137,7 @@ exports.routes.post("/login", function (req, res) { return __awaiter(void 0, voi
             case 1:
                 user = _b.sent();
                 if (!user) {
-                    return [2 /*return*/, res.status(400).json({ msg: "wrong password or e-mail" })];
+                    return [2 /*return*/, res.status(400).json({ msg: 'wrong password or e-mail' })];
                 }
                 return [4 /*yield*/, bcrypt.compare(password, user.passwordHash)];
             case 2:
@@ -148,7 +148,7 @@ exports.routes.post("/login", function (req, res) { return __awaiter(void 0, voi
                     return [2 /*return*/, res.status(200).json({ user: user, token: token })];
                 }
                 else {
-                    return [2 /*return*/, res.status(400).json({ msg: "Wrong password or e-mail" })];
+                    return [2 /*return*/, res.status(400).json({ msg: 'Wrong password or e-mail' })];
                 }
                 return [3 /*break*/, 4];
             case 3:
@@ -159,7 +159,7 @@ exports.routes.post("/login", function (req, res) { return __awaiter(void 0, voi
         }
     });
 }); });
-exports.routes.get("/user", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.get('/user', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, user, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -167,7 +167,7 @@ exports.routes.get("/user", isAuthenticated, attachCurrentUser, function (req, r
                 _a.trys.push([0, 2, , 3]);
                 loggedInUser = req.auth;
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 console.log(loggedInUser);
                 return [4 /*yield*/, prisma_1.prisma.user.findUnique({
@@ -175,7 +175,7 @@ exports.routes.get("/user", isAuthenticated, attachCurrentUser, function (req, r
                     })];
             case 1:
                 user = _a.sent();
-                user.passwordHash = "";
+                user.passwordHash = '';
                 console.log(user);
                 return [2 /*return*/, res.status(200).json(user)];
             case 2:
@@ -186,7 +186,7 @@ exports.routes.get("/user", isAuthenticated, attachCurrentUser, function (req, r
         }
     });
 }); });
-exports.routes.patch("/togglePaymentMethod", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/togglePaymentMethod', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, payment, user, edittedUser, edittedUser, edittedUser, edittedUser, edittedUser, edittedUser, error_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -199,8 +199,8 @@ exports.routes.patch("/togglePaymentMethod", isAuthenticated, attachCurrentUser,
                     })];
             case 1:
                 user = _a.sent();
-                if (!(payment === "pix")) return [3 /*break*/, 5];
-                console.log("entrei no if do pix");
+                if (!(payment === 'pix')) return [3 /*break*/, 5];
+                console.log('entrei no if do pix');
                 if (!user.paymentMethod.pix) return [3 /*break*/, 3];
                 return [4 /*yield*/, prisma_1.prisma.user.update({
                         where: { id: id },
@@ -223,7 +223,7 @@ exports.routes.patch("/togglePaymentMethod", isAuthenticated, attachCurrentUser,
                 console.log(edittedUser);
                 return [2 /*return*/, res.status(200).json(edittedUser)];
             case 5:
-                if (!(payment === "cartao")) return [3 /*break*/, 9];
+                if (!(payment === 'cartao')) return [3 /*break*/, 9];
                 if (!user.paymentMethod.cartao) return [3 /*break*/, 7];
                 return [4 /*yield*/, prisma_1.prisma.user.update({
                         where: { id: id },
@@ -246,7 +246,7 @@ exports.routes.patch("/togglePaymentMethod", isAuthenticated, attachCurrentUser,
                 console.log(edittedUser);
                 return [2 /*return*/, res.status(200).json(edittedUser)];
             case 9:
-                if (!(payment === "dinheiro")) return [3 /*break*/, 13];
+                if (!(payment === 'dinheiro')) return [3 /*break*/, 13];
                 if (!user.paymentMethod.dinheiro) return [3 /*break*/, 11];
                 return [4 /*yield*/, prisma_1.prisma.user.update({
                         where: { id: id },
@@ -277,7 +277,7 @@ exports.routes.patch("/togglePaymentMethod", isAuthenticated, attachCurrentUser,
     });
 }); });
 // rotas de categorias
-exports.routes.post("/newCategory", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.post('/newCategory', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, _a, title, description, post, error_5;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -286,7 +286,7 @@ exports.routes.post("/newCategory", isAuthenticated, attachCurrentUser, function
                 loggedInUser = req.auth;
                 userId = loggedInUser.id;
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 _a = req.body, title = _a.title, description = _a.description;
                 return [4 /*yield*/, prisma_1.prisma.category.create({
@@ -312,7 +312,7 @@ exports.routes.post("/newCategory", isAuthenticated, attachCurrentUser, function
         }
     });
 }); });
-exports.routes.get("/getCategory", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.get('/getCategory', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, userCategories, error_6;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -321,7 +321,7 @@ exports.routes.get("/getCategory", isAuthenticated, attachCurrentUser, function 
                 loggedInUser = req.auth;
                 userId = loggedInUser.id;
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.category.findMany({
                         where: { userId: userId }
@@ -338,7 +338,7 @@ exports.routes.get("/getCategory", isAuthenticated, attachCurrentUser, function 
         }
     });
 }); });
-exports.routes["delete"]("/deleteCategory", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes["delete"]('/deleteCategory', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, categoryId, categoryForId, category, error_7;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -348,7 +348,7 @@ exports.routes["delete"]("/deleteCategory", isAuthenticated, attachCurrentUser, 
                 userId = loggedInUser.id;
                 categoryId = req.body.categoryId;
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.category.findUnique({
                         where: { id: categoryId }
@@ -364,8 +364,10 @@ exports.routes["delete"]("/deleteCategory", isAuthenticated, attachCurrentUser, 
                 console.log(category);
                 return [2 /*return*/, res.status(200).json(category)];
             case 3:
-                console.log("user não é dono da categoria");
-                return [2 /*return*/, res.status(500).json({ msg: "user não é dono da categoria" })];
+                console.log('user não é dono da categoria');
+                return [2 /*return*/, res
+                        .status(500)
+                        .json({ msg: 'user não é dono da categoria' })];
             case 4:
                 error_7 = _a.sent();
                 console.error(error_7);
@@ -375,7 +377,7 @@ exports.routes["delete"]("/deleteCategory", isAuthenticated, attachCurrentUser, 
     });
 }); });
 // rotas de produto
-exports.routes.post("/newProduct", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.post('/newProduct', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, title, price, description, image, category, data, newProduct, error_8;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -408,7 +410,7 @@ exports.routes.post("/newProduct", function (req, res) { return __awaiter(void 0
         }
     });
 }); });
-exports.routes.get("/getProducts/:category", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.get('/getProducts/:category', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var category, loggedInUser, userId, categoryForId, categoryId, categoryProducts, error_9;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -419,7 +421,7 @@ exports.routes.get("/getProducts/:category", isAuthenticated, attachCurrentUser,
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.category.findFirst({
                         where: { userId: userId, title: category }
@@ -428,7 +430,9 @@ exports.routes.get("/getProducts/:category", isAuthenticated, attachCurrentUser,
                 categoryForId = _a.sent();
                 categoryId = categoryForId === null || categoryForId === void 0 ? void 0 : categoryForId.id;
                 if (categoryId === undefined) {
-                    return [2 /*return*/, res.status(404).json({ msg: "categoria não encontrada" })];
+                    return [2 /*return*/, res
+                            .status(404)
+                            .json({ msg: 'categoria não encontrada' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.product.findMany({
                         where: { categoryId: categoryId }
@@ -445,7 +449,7 @@ exports.routes.get("/getProducts/:category", isAuthenticated, attachCurrentUser,
         }
     });
 }); });
-exports.routes["delete"]("/deleteProduct", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes["delete"]('/deleteProduct', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, _a, prodId, catId, categoryForId, deletedProduct, error_10;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -455,7 +459,7 @@ exports.routes["delete"]("/deleteProduct", isAuthenticated, attachCurrentUser, f
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 _a = req.body, prodId = _a.prodId, catId = _a.catId;
                 return [4 /*yield*/, prisma_1.prisma.category.findFirst({
@@ -480,7 +484,7 @@ exports.routes["delete"]("/deleteProduct", isAuthenticated, attachCurrentUser, f
         }
     });
 }); });
-exports.routes.patch("/editProduct", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/editProduct', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, _a, prodId, catId, title, price, image, description, categoryForId, editedProduct, error_11;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -490,7 +494,7 @@ exports.routes.patch("/editProduct", isAuthenticated, attachCurrentUser, functio
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 _a = req.body, prodId = _a.prodId, catId = _a.catId, title = _a.title, price = _a.price, image = _a.image, description = _a.description;
                 // busca no banco de dados a categoria passada pela requisição
@@ -501,7 +505,7 @@ exports.routes.patch("/editProduct", isAuthenticated, attachCurrentUser, functio
             case 1:
                 categoryForId = _b.sent();
                 // caso o ID do usuário da categoria passada seja igual ao id do login, edita o produto
-                console.log("cheguei aqui");
+                console.log('cheguei aqui');
                 if (!(categoryForId.userId === userId)) return [3 /*break*/, 3];
                 return [4 /*yield*/, prisma_1.prisma.product.update({
                         where: {
@@ -527,7 +531,7 @@ exports.routes.patch("/editProduct", isAuthenticated, attachCurrentUser, functio
         }
     });
 }); });
-exports.routes.patch("/toggleProduct", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/toggleProduct', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, _a, prodId, catId, categoryForId, toggleProductInfo, toggleProduct, toggleProduct, error_12;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -537,7 +541,7 @@ exports.routes.patch("/toggleProduct", isAuthenticated, attachCurrentUser, funct
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 _a = req.body.data, prodId = _a.prodId, catId = _a.catId;
                 return [4 /*yield*/, prisma_1.prisma.category.findFirst({
@@ -546,7 +550,7 @@ exports.routes.patch("/toggleProduct", isAuthenticated, attachCurrentUser, funct
             case 1:
                 categoryForId = _b.sent();
                 if (!(categoryForId.userId === userId)) return [3 /*break*/, 6];
-                console.log("entrei no primeiro if");
+                console.log('entrei no primeiro if');
                 return [4 /*yield*/, prisma_1.prisma.product.findUnique({
                         where: { id: prodId }
                     })];
@@ -579,7 +583,7 @@ exports.routes.patch("/toggleProduct", isAuthenticated, attachCurrentUser, funct
     });
 }); });
 // rotas de pedidos
-exports.routes.post("/newOrder", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.post('/newOrder', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, title_1, info_1, quantity_1, tableId_1, clientId_1, productId_1, orderTable, userId, tables, orders, map, error_13;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -587,8 +591,8 @@ exports.routes.post("/newOrder", function (req, res) { return __awaiter(void 0, 
                 _b.trys.push([0, 3, , 4]);
                 _a = req.body.data, title_1 = _a.title, info_1 = _a.info, quantity_1 = _a.quantity, tableId_1 = _a.tableId, clientId_1 = _a.clientId, productId_1 = _a.productId;
                 if (clientId_1 === undefined) {
-                    console.log("CLIENT ID UNDEFINED");
-                    return [2 /*return*/, res.status(500).json({ msg: "CLIENT ID UNDEFINED" })];
+                    console.log('CLIENT ID UNDEFINED');
+                    return [2 /*return*/, res.status(500).json({ msg: 'CLIENT ID UNDEFINED' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.table.findFirst({
                         where: { id: tableId_1 }
@@ -632,7 +636,16 @@ exports.routes.post("/newOrder", function (req, res) { return __awaiter(void 0, 
                         productId: productId_1
                     };
                     var createdOrder = prisma_1.prisma.check
-                        .create({ data: { orders: { create: [data] } } })
+                        .create({
+                        data: {
+                            client: {
+                                connect: {
+                                    id: clientId_1
+                                }
+                            },
+                            orders: { create: [data] }
+                        }
+                    })
                         .then(function (result) {
                         console.log(result);
                         return res.status(200).json(result);
@@ -647,7 +660,7 @@ exports.routes.post("/newOrder", function (req, res) { return __awaiter(void 0, 
         }
     });
 }); });
-exports.routes.get("/getOrders", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.get('/getOrders', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, tables, orders, map, error_14;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -681,7 +694,7 @@ exports.routes.get("/getOrders", isAuthenticated, attachCurrentUser, function (r
                     if (orders.length === 0) {
                         return res
                             .status(200)
-                            .json({ msg: "Usuário não tem pedidos ativos." });
+                            .json({ msg: 'Usuário não tem pedidos ativos.' });
                     }
                     console.log(orders);
                     return res.status(200).json(orders);
@@ -695,7 +708,7 @@ exports.routes.get("/getOrders", isAuthenticated, attachCurrentUser, function (r
         }
     });
 }); });
-exports.routes.patch("/toggleOrder", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/toggleOrder', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id;
     return __generator(this, function (_a) {
         try {
@@ -709,7 +722,7 @@ exports.routes.patch("/toggleOrder", function (req, res) { return __awaiter(void
     });
 }); });
 // rotas de mesa
-exports.routes.post("/newTable", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.post('/newTable', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, tables, number, qrcode, data, newTable, error_15;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -719,7 +732,7 @@ exports.routes.post("/newTable", isAuthenticated, attachCurrentUser, function (r
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.table.findMany({
                         where: { userId: userId }
@@ -727,7 +740,7 @@ exports.routes.post("/newTable", isAuthenticated, attachCurrentUser, function (r
             case 1:
                 tables = _a.sent();
                 number = tables.length + 1;
-                qrcode = "1231231231233333";
+                qrcode = '1231231231233333';
                 data = {
                     userId: userId,
                     number: number,
@@ -745,7 +758,7 @@ exports.routes.post("/newTable", isAuthenticated, attachCurrentUser, function (r
         }
     });
 }); });
-exports.routes.patch("/changeTableNumber", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/changeTableNumber', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, _a, id, number, currentTable, editedTable, error_16;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -755,7 +768,7 @@ exports.routes.patch("/changeTableNumber", isAuthenticated, attachCurrentUser, f
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 _a = req.body, id = _a.id, number = _a.number;
                 return [4 /*yield*/, prisma_1.prisma.table.findUnique({
@@ -764,8 +777,10 @@ exports.routes.patch("/changeTableNumber", isAuthenticated, attachCurrentUser, f
             case 1:
                 currentTable = _b.sent();
                 if (currentTable.userId !== userId) {
-                    console.log("usuário não é dono da mesa para edita-la");
-                    return [2 /*return*/, res.status(400).json({ msg: "usuário não é dono da mesa" })];
+                    console.log('usuário não é dono da mesa para edita-la');
+                    return [2 /*return*/, res
+                            .status(400)
+                            .json({ msg: 'usuário não é dono da mesa' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.table.update({
                         where: { id: id },
@@ -783,7 +798,7 @@ exports.routes.patch("/changeTableNumber", isAuthenticated, attachCurrentUser, f
         }
     });
 }); });
-exports.routes["delete"]("/deleteTable", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes["delete"]('/deleteTable', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, id, currentTable, deletedTable, error_17;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -793,7 +808,7 @@ exports.routes["delete"]("/deleteTable", isAuthenticated, attachCurrentUser, fun
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 id = req.body.id;
                 return [4 /*yield*/, prisma_1.prisma.table.findUnique({
@@ -802,8 +817,10 @@ exports.routes["delete"]("/deleteTable", isAuthenticated, attachCurrentUser, fun
             case 1:
                 currentTable = _a.sent();
                 if (currentTable.userId !== userId) {
-                    console.log("usuário não é dono da mesa para edita-la");
-                    return [2 /*return*/, res.status(400).json({ msg: "usuário não é dono da mesa" })];
+                    console.log('usuário não é dono da mesa para edita-la');
+                    return [2 /*return*/, res
+                            .status(400)
+                            .json({ msg: 'usuário não é dono da mesa' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.table["delete"]({
                         where: { id: id }
@@ -811,7 +828,7 @@ exports.routes["delete"]("/deleteTable", isAuthenticated, attachCurrentUser, fun
             case 2:
                 deletedTable = _a.sent();
                 console.log(deletedTable);
-                return [2 /*return*/, res.status(200).json({ msg: "mesa deletada", deletedTable: deletedTable })];
+                return [2 /*return*/, res.status(200).json({ msg: 'mesa deletada', deletedTable: deletedTable })];
             case 3:
                 error_17 = _a.sent();
                 console.error(error_17);
@@ -820,7 +837,7 @@ exports.routes["delete"]("/deleteTable", isAuthenticated, attachCurrentUser, fun
         }
     });
 }); });
-exports.routes.patch("/toggleTable", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/toggleTable', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, id, currentTable, currentState, deletedTable, error_18;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -830,7 +847,7 @@ exports.routes.patch("/toggleTable", isAuthenticated, attachCurrentUser, functio
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 id = req.body.id;
                 return [4 /*yield*/, prisma_1.prisma.table.findUnique({
@@ -840,8 +857,10 @@ exports.routes.patch("/toggleTable", isAuthenticated, attachCurrentUser, functio
                 currentTable = _a.sent();
                 currentState = currentTable.active;
                 if (currentTable.userId !== userId) {
-                    console.log("usuário não é dono da mesa para edita-la");
-                    return [2 /*return*/, res.status(400).json({ msg: "usuário não é dono da mesa" })];
+                    console.log('usuário não é dono da mesa para edita-la');
+                    return [2 /*return*/, res
+                            .status(400)
+                            .json({ msg: 'usuário não é dono da mesa' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.table.update({
                         where: { id: id },
@@ -861,7 +880,7 @@ exports.routes.patch("/toggleTable", isAuthenticated, attachCurrentUser, functio
         }
     });
 }); });
-exports.routes.get("/getTables", isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.get('/getTables', isAuthenticated, attachCurrentUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var loggedInUser, userId, userTables, error_19;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -871,7 +890,7 @@ exports.routes.get("/getTables", isAuthenticated, attachCurrentUser, function (r
                 userId = loggedInUser.id;
                 // testa se o loggedInUser foi encontrado
                 if (!loggedInUser) {
-                    return [2 /*return*/, res.status(404).json({ msg: "usuário não encontrado" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'usuário não encontrado' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.table.findMany({
                         where: { userId: userId }
@@ -889,7 +908,7 @@ exports.routes.get("/getTables", isAuthenticated, attachCurrentUser, function (r
     });
 }); });
 // routes de cliente
-exports.routes.post("/loginClient", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.post('/loginClient', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, name_1, number, user, newClient, error_20;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -901,10 +920,12 @@ exports.routes.post("/loginClient", function (req, res) { return __awaiter(void 
                 user = _b.sent();
                 if (!(user !== null)) return [3 /*break*/, 2];
                 if (user.name === name_1) {
-                    return [2 /*return*/, res.status(200).json({ msg: "usuário logado" })];
+                    return [2 /*return*/, res.status(200).json({ msg: 'usuário logado' })];
                 }
                 else {
-                    return [2 /*return*/, res.status(500).json({ msg: "nome de usuário incorreto" })];
+                    return [2 /*return*/, res
+                            .status(500)
+                            .json({ msg: 'nome de usuário incorreto' })];
                 }
                 return [3 /*break*/, 4];
             case 2: return [4 /*yield*/, prisma_1.prisma.client.create({
@@ -923,7 +944,7 @@ exports.routes.post("/loginClient", function (req, res) { return __awaiter(void 
     });
 }); });
 // get produtos e categorias pelo cliente
-exports.routes.patch("/categoriesClient", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/categoriesClient', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, table, userId, userCategories, error_21;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -951,7 +972,7 @@ exports.routes.patch("/categoriesClient", function (req, res) { return __awaiter
         }
     });
 }); });
-exports.routes.patch("/getProductsClient/:category", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/getProductsClient/:category', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var category, id, table, userId, categoryForId, categoryId, categoryProducts, error_22;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -972,7 +993,7 @@ exports.routes.patch("/getProductsClient/:category", function (req, res) { retur
                 categoryForId = _a.sent();
                 categoryId = categoryForId === null || categoryForId === void 0 ? void 0 : categoryForId.id;
                 if (categoryId === undefined) {
-                    return [2 /*return*/, res.status(404).json({ msg: "categoria não encontrada" })];
+                    return [2 /*return*/, res.status(404).json({ msg: 'categoria não encontrada' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.product.findMany({
                         where: { categoryId: categoryId }
@@ -989,7 +1010,7 @@ exports.routes.patch("/getProductsClient/:category", function (req, res) { retur
         }
     });
 }); });
-exports.routes.patch("/getCheck", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/getCheck', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, check, error_23;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -1011,7 +1032,7 @@ exports.routes.patch("/getCheck", function (req, res) { return __awaiter(void 0,
         }
     });
 }); });
-exports.routes.post("/newOrderOnExistingCheck", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.post('/newOrderOnExistingCheck', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, title_2, info_2, quantity_2, tableId_2, checkId_1, clientId_2, productId_2, orderTable, userId, tables, orders, map, error_24;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -1019,8 +1040,8 @@ exports.routes.post("/newOrderOnExistingCheck", function (req, res) { return __a
                 _b.trys.push([0, 3, , 4]);
                 _a = req.body.data, title_2 = _a.title, info_2 = _a.info, quantity_2 = _a.quantity, tableId_2 = _a.tableId, checkId_1 = _a.checkId, clientId_2 = _a.clientId, productId_2 = _a.productId;
                 if (clientId_2 === undefined) {
-                    console.log("CLIENT ID UNDEFINED");
-                    return [2 /*return*/, res.status(500).json({ msg: "CLIENT ID UNDEFINED" })];
+                    console.log('CLIENT ID UNDEFINED');
+                    return [2 /*return*/, res.status(500).json({ msg: 'CLIENT ID UNDEFINED' })];
                 }
                 return [4 /*yield*/, prisma_1.prisma.table.findFirst({
                         where: { id: tableId_2 }
@@ -1082,7 +1103,7 @@ exports.routes.post("/newOrderOnExistingCheck", function (req, res) { return __a
         }
     });
 }); });
-exports.routes.patch("/toggleCheck", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.routes.patch('/toggleCheck', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, check, orders, error_25;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -1108,6 +1129,49 @@ exports.routes.patch("/toggleCheck", function (req, res) { return __awaiter(void
                 console.error(error_25);
                 return [2 /*return*/, res.status(500).json(error_25)];
             case 4: return [2 /*return*/];
+        }
+    });
+}); });
+exports.routes.patch('/getChecksByClientId', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var clientId, checks, error_26;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                clientId = req.body.clientId;
+                return [4 /*yield*/, prisma_1.prisma.check.findMany({
+                        where: { clientId: clientId },
+                        include: { orders: true }
+                    })];
+            case 1:
+                checks = _a.sent();
+                console.log(checks);
+                return [2 /*return*/, res.status(200).json(checks)];
+            case 2:
+                error_26 = _a.sent();
+                console.error(error_26);
+                return [2 /*return*/, res.status(500).json(error_26)];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+exports.routes.get('/getProductsById/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, product, error_27;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                id = req.params.id;
+                return [4 /*yield*/, prisma_1.prisma.product.findFirst({ where: { id: id } })];
+            case 1:
+                product = _a.sent();
+                console.log(product);
+                return [2 /*return*/, res.status(200).json(product)];
+            case 2:
+                error_27 = _a.sent();
+                console.error(error_27);
+                return [2 /*return*/, res.status(500).json(error_27)];
+            case 3: return [2 /*return*/];
         }
     });
 }); });
