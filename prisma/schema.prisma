@@ -78,10 +78,10 @@ model Client {
 }
 
 model Check {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  isDisabled Boolean  @default(false)
-  isPaid     Boolean  @default(false)
-  client     Client   @relation(fields: [clientId], references: [id])
-  clientId   String   @db.ObjectId
-  orders     Orders[]
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  active   Boolean  @default(false)
+  isPaid   Boolean  @default(false)
+  client   Client   @relation(fields: [clientId], references: [id])
+  clientId String   @db.ObjectId
+  orders   Orders[]
 }

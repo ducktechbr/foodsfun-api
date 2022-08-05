@@ -1052,7 +1052,7 @@ routes.patch("/toggleCheck", async (req, res) => {
 
     const check = await prisma.check.update({
       where: { id },
-      data: { isDisabled: true },
+      data: { active: false },
     });
 
     const orders = await prisma.orders.updateMany({
@@ -1105,7 +1105,6 @@ routes.get("/comanda/:clientId", async (req, res) => {
     var orders = [];
     var productsIds = [];
     var products = [];
-    var imgs = [];
     for (let i = 0; i < checks.length; i++) {
       orders.push(checks[i].orders);
     }
@@ -1123,7 +1122,7 @@ routes.get("/comanda/:clientId", async (req, res) => {
       products[i].quantity = orders[i][0].quantity;
     }
 
-    return res.status(200).json(products);
+    return res.status(200).json(checks);
   } catch (error) {
     console.error(error);
     return res.status(500).json(error);
