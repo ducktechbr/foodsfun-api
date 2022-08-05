@@ -19,6 +19,22 @@ routes.get("/healthcheck", async (req, res) => {
   }
 });
 
+// Route de novo usuário, caminho "/newUser" recebe req com body em json como o seguinte:
+//
+// {
+// 	"userName":"higao@reidelas.co123123m",
+// 	"email": "higao@reidelas.co123m",
+// 	"password":"694111h123123"
+// }
+//
+// password precisa ter no mínimo 6 caracteres, pelo menos 1 letra e 1 numero
+//
+// requisição retorna usuário criado
+//
+// casos de erro : password nao bate o regex, retorna 400 e uma mensagem
+//
+// usuário duplicado, retorna status 500 e uma msg
+
 routes.post("/newUser", async (req, res) => {
   try {
     const { userName, email, password } = req.body;
@@ -65,6 +81,14 @@ routes.post("/newUser", async (req, res) => {
   }
 });
 
+// rota de login, caminho "/login" recebe como body um json como o seguinte:
+//
+// {"email":"podres@123ss.com","password":"xeisssssas1"}
+//
+// caso tenha algum erro no login retorna um erro 400 e uma mensagem de password ou email errado
+//
+// caso o login de certo, retorna um usuário e a token jwt
+
 routes.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -85,6 +109,8 @@ routes.post("/login", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+// rota de get usuário, caminho "/user", recebe uma requisição get com bearer token o JWT do usuário logado e devolve o usuário, caso o usuário não esteja logado, ou a requisição nao mande um JWT como bearer token, a rota devolve erro 404 e uma mensagem
 
 routes.get(
   "/user",
@@ -109,6 +135,14 @@ routes.get(
     }
   }
 );
+
+// requisição de toggle de método de pagamento, caminho "/togglePaymentMethod" recebe uma requisição com bearer token do usuário logado, caso o usuário não esteja logado, ou a requisição nao mande um JWT como bearer token, a rota devolve erro 404 e uma mensagem.
+// A requisição deve ter um body em JSON como o seguinte:
+// {
+// 	"payment":"pix"
+// }
+//
+// caso o "payment" da requisição seja "pix" a requisição faz toggle no método de pagamento pix, caso seja "cartao", faz toggle no metodo de pagamento cartão, caso seja "dinheiro" faz o toggle no método de pagamento dinheiro
 
 routes.patch(
   "/togglePaymentMethod",
@@ -213,6 +247,13 @@ routes.patch(
 
 // rotas de categorias
 
+// rota de nova categoria, caminho "/newCategory", recebe uma requisição com bearer token do usuário logado, e um body em json como o seguinte:
+// {
+// 	"title": "carnes",
+// 	"description": "burgues de carne de todos os jeitos, feitos da forma que voce achar melhor"
+// }
+// retorna a categoria criada
+
 routes.post(
   "/newCategory",
   isAuthenticated,
@@ -246,6 +287,8 @@ routes.post(
   }
 );
 
+// rota de get de caregoria, caminho "/getCategory", recebe uma requisição com bearer token do usuário logado e retorna todas as categorias do usuário logado
+
 routes.get(
   "/getCategory",
   isAuthenticated,
@@ -268,6 +311,12 @@ routes.get(
     }
   }
 );
+
+// rota de delete de categoria, caminho "/deleteCategory", recebe uma requisição com bearer token do usuário logado e um body em json como o seguinte:
+// {
+// 	"categoryId":"7123t12hgyd192t312"
+// }
+// retorna a caregoria deletada com o ID passado na requisição dentro do body
 
 routes.delete(
   "/deleteCategory",
@@ -305,6 +354,17 @@ routes.delete(
 
 // rotas de produto
 
+// rota de criação de novo produto, caminho "/newProduct", recebe um body como o seguinter:
+// {
+// 	"title": "GROSSAO e finim",
+// 	"price": "12,10" ,
+// 	"category": "62cf1e5c12305134efaab4a7" ,
+// 	"description": "pizza com queijo e queijo e queijo e queijo",
+// 	"image":"IMAGEM EM BASE64"
+// }
+// category é o id da categoria mae do produto a ser adicionado
+// cria um novo produto filho da categoria passada na requisição
+
 routes.post("/newProduct", async (req, res) => {
   try {
     const { title, price, description, image, category } = req.body;
@@ -329,6 +389,9 @@ routes.post("/newProduct", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+// rota de get de produtos por categoria, caminho "/getProducts/:category", a parte do caminho ":category" é variável, e leva o nome da categoria a qual voce quer pesquisar, a requisição recebe a token do usuário logado como bearer token.
+// caso exista uma categoria com o nome passado na requisição atrelada ao usuário logado, a requisição retorna todos os produtos atrelado a essa categoria.
 
 routes.get(
   "/getProducts/:category",
@@ -380,6 +443,13 @@ routes.get(
   }
 );
 
+// rota de delete product, caminho "/deleteProduct", recebe a token do usuário logado como bearer token, rota recebe body em json como o seguinte:
+// {
+// 	"prodId": "62d059c186184a52f6169a78",
+// 	"catId":"62cf1e5c12305134efaab4a7"
+// }
+// a rota deleta o produto com id prodId e com categoria de id catId.
+
 routes.delete(
   "/deleteProduct",
   isAuthenticated,
@@ -428,6 +498,18 @@ routes.delete(
   }
 );
 
+// rota de edit product, caminho "/editProduct"  recebe a token do usuário logado como bearer token, e um body em json como o seguinte:
+// {
+// "prodId":"g76d12d77w8d9178te",
+//  "catId":"g76d12d77w8d9178te",
+//   "title":"novo nome",
+//    "price":"novo preço",
+//     "image":"nova imagem em base64",
+// 	 "description":"nova descrição do produto"
+// 	}
+//
+// pesquisa o produto pelo prodId da requisição, atualiza o protudo com as informações da requisicao, e retorna o produto editado com as novas informações de produto
+
 routes.patch(
   "/editProduct",
   isAuthenticated,
@@ -460,7 +542,6 @@ routes.patch(
       });
 
       // caso o ID do usuário da categoria passada seja igual ao id do login, edita o produto
-      console.log("cheguei aqui");
       if (categoryForId.userId === userId) {
         const editedProduct = await prisma.product.update({
           where: {
@@ -483,6 +564,12 @@ routes.patch(
     }
   }
 );
+
+// rota de toggle de produto, caminho "/toggleProduct", recebe o token do usuáro logado no bearer, e um body em json como o seguinte:
+// {
+// 	"prodId": "62d076ba4c40d273dca14585", "catId": "62c7413dd8323d84766373c2"
+// }
+// caso exista um produto com esse id e uma categoria com o id passado na requisição, a rota muda o active de true para false ou de false para true
 
 routes.patch(
   "/toggleProduct",
@@ -548,6 +635,18 @@ routes.patch(
 );
 
 // rotas de pedidos
+
+// rota de criação de pedido, caminho "/newOrder", recebe um body em json como o seguinte:
+// {"data":{
+	// "title":"titulo do produto",
+	// "info":"informação para a cozinha sobre o pedido", 
+	// "quantity":5,
+	// "tableId":"62eac0ae5ab1639a6ef43af9", 
+	// "clientId":"62e7e26463c62b9524330eea", 
+	// "productId":"62e836d3edb8cb79de964df8"
+// }}
+// 
+// a requisição cria uma nova comanda com o pedidos descrito no body da requisição
 
 routes.post("/newOrder", async (req, res) => {
   try {
@@ -616,6 +715,8 @@ routes.post("/newOrder", async (req, res) => {
   }
 });
 
+// rota de get de pedidos, caminho "/getOrders", recebe a token do usuário logado como bearer token, e retorna todos os pedidos atrelados ao usuário logado.
+
 routes.get(
   "/getOrders",
   isAuthenticated,
@@ -662,22 +763,28 @@ routes.get(
   }
 );
 
-routes.patch(
-  "/toggleOrder",
+// 
+// 
+// 
 
-  async (req: any, res) => {
-    try {
-      // retira o loggedinuser da requisição pelo middleware attachCurrentUser
+// routes.patch(
+//   "/toggleOrder",
 
-      const { id } = req.body;
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json(error);
-    }
-  }
-);
+//   async (req: any, res) => {
+//     try {
+//       // retira o loggedinuser da requisição pelo middleware attachCurrentUser
+
+//       const { id } = req.body;
+//     } catch (error) {
+//       console.error(error);
+//       return res.status(500).json(error);
+//     }
+//   }
+// );
 
 // rotas de mesa
+
+// route de post de nova mesa, caminho "/newTable", recebe o usuário logado pelo token no bearer, e cria uma nova mesa, retorna as informações da mesa criada.
 
 routes.post(
   "/newTable",
@@ -719,6 +826,10 @@ routes.post(
     }
   }
 );
+
+// route de editar o numero da mesa, caminho "/changeTableNumber" recebe o token do usuario logado no bearer, e um body em json coomo o seguinte:
+// { "id" : "id da mesa", "number" : 321 } 
+// edita a mesa com o id passado no body da requisição e edita com o numero passado na requisição
 
 routes.patch(
   "/changeTableNumber",
@@ -764,6 +875,10 @@ routes.patch(
   }
 );
 
+// route de deletar mesa, caminho "/deleteTable", recebe o token do usuario logado no bearer, e um body em json como o seguinte:
+// {"id":"id da table para ser deletada"}
+// deleta a mesa com o id passado na requisição caso ela seja do usuário logado
+
 routes.delete(
   "/deleteTable",
   isAuthenticated,
@@ -807,6 +922,10 @@ routes.delete(
     }
   }
 );
+
+// route de toggle de mesa no caminho  "/toggleTable", recebe o usuario pelo token,  e um body em json como o seguinte:
+// {"id":"id da table para sofrer o toggle"}
+// verifica se o usuario é dono da mesa, e caso seja, muda o active de true para false ou de false para true
 
 routes.patch(
   "/toggleTable",
@@ -855,6 +974,8 @@ routes.patch(
   }
 );
 
+// route de get tables, caminho "/getTables", rota recebe o token do usuario pelo bearer e retorna todas as mesas atreladas ao usuário
+
 routes.get(
   "/getTables",
   isAuthenticated,
@@ -890,6 +1011,15 @@ routes.get(
 
 // routes de cliente
 
+
+// route de login do cliente, caminho "/loginClient" recebe um body em json como o seguinte:
+// { 
+// 	"name":"nome de usuário", 
+// "number": "número de celular do usuário" 
+// }
+// caso o numero nao esteja guardado no banco de dados, a rota salva os dados do usuário na base e retorna o usuário criado.
+// caso o número já esteja guardado, a rota verifica se o nome de usuário bate com o nome de usuário guardado na base, caso o nome bata com o nome da base a rota retorna status 200 e uma mensagem de usuário logado, caso o nome não bata ela retorna um status 500 e uma mensagem de nome de usuário incorreto.
+
 routes.post("/loginClient", async (req, res) => {
   try {
     const { name, number } = req.body;
@@ -915,7 +1045,11 @@ routes.post("/loginClient", async (req, res) => {
   }
 });
 
-// get produtos e categorias pelo cliente
+// get categorias pelo cliente, caminho "/categoriesClient", rota recebe um body em json como o seguinte:
+// {
+// "id": "id da mesa na qual o cliente fez login"
+// }
+// com o id da mesa da requisição a rota retorna todas das categorias do usuário dono da mesa.
 
 routes.patch("/categoriesClient", async (req, res) => {
   try {
@@ -934,6 +1068,13 @@ routes.patch("/categoriesClient", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+// rota de get produtos dependendo da categoria, caminho "/getProductsClient/:category", onde a parte ":category" é variável. a requisição recebe um body em json com o id da table que o usuário logou como essa:
+//  {
+// "id": "id da mesa na qual o cliente fez login"
+// }
+// a rota pesquisa pela categoria descrita no caminho da rota dentro do usuário dono da mesa, e caso ela ache a categoria, ela retorna todos os produtos dessa categoria.
+
 
 routes.patch("/getProductsClient/:category", async (req: any, res) => {
   try {
@@ -971,6 +1112,13 @@ routes.patch("/getProductsClient/:category", async (req: any, res) => {
   }
 });
 
+// rota de get de check, caminho "/getCheck" recebe o id do check a ser pesquisado na DB no body da requisição em um json como o seguinte:
+// {
+// 	"id" : "id do check a ser encontrado"
+// }
+// pesquisa pelo check na DB e caso encontre retorna o check com todas as ordens atreladas a ele
+
+
 routes.patch("/getCheck", async (req, res) => {
   try {
     const { id } = req.body;
@@ -984,6 +1132,20 @@ routes.patch("/getCheck", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+
+// criação de nova ordem em um check já existente, caminho "/newOrderOnExistingCheck", recebe um body como o seguinte : 
+// 
+// {"data":
+// 		{
+// 			"title":"xelada",
+// 			"info":"NOSSA", 
+// 			"quantity":5,
+// 			"tableId":"62e974bdc7b686586fbb7064", 
+// 			"checkId":"62ea6f8f349c09ebd5e11f68"
+// 		}
+// }
+// cria uma nova ordem com as informações passadas no body dentro do check passado no body
 
 routes.post("/newOrderOnExistingCheck", async (req, res) => {
   try {
@@ -1046,6 +1208,12 @@ routes.post("/newOrderOnExistingCheck", async (req, res) => {
   }
 });
 
+// rota de toggle de check, caminho "/toggleCheck", recebe um body em json como o seguinte:
+// {
+// 	"id":"id do check a sofrer o toggle"
+// }
+// muda a propriedade active do objeto check do checkId passado na requisição de false para true, e muda também a propriedade active de todas as ordens atreladas a essa comanda de false para true
+ 
 routes.patch("/toggleCheck", async (req, res) => {
   try {
     const { id } = req.body;
@@ -1068,6 +1236,12 @@ routes.patch("/toggleCheck", async (req, res) => {
   }
 });
 
+// rota para pegar todos os checks de um usuário, recebe o clientId no body da requisição em json como a seguinte:
+// {
+// 	"clientId" = "id do cliente"
+// }
+// pesquisa por todas as comandas atreladas ao cliente da requisição e retorna as comandas com todas as ordens atreladas a aquele usuário
+
 routes.patch("/getChecksByClientId", async (req, res) => {
   try {
     const { clientId } = req.body;
@@ -1083,6 +1257,8 @@ routes.patch("/getChecksByClientId", async (req, res) => {
   }
 });
 
+// rota de get de produtos pelo Id, caminho "/getProductsById/:id" com a parte de ":id" variável, retorna o produto com o id passado no caminho.
+
 routes.get("/getProductsById/:id", async (req, res) => {
   try {
     const id: any = req.params.id;
@@ -1094,6 +1270,8 @@ routes.get("/getProductsById/:id", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+// rota para pegar todas as informações necessárias para a página de comandaApp do aplicativo, com o clientId, retorna todos os pedidos, a quantidade de cada produto, a imagem dos produtos, e o preço de cada um, caminho "/comanda/:clientId" onde ":clientId" deve ser trocado pelo ID do cliente que busca a comanda.
 
 routes.get("/comanda/:clientId", async (req, res) => {
   try {
@@ -1128,3 +1306,4 @@ routes.get("/comanda/:clientId", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
