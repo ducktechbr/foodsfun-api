@@ -1106,7 +1106,7 @@ routes.get("/comanda/:clientId", async (req, res) => {
     var productsIds = [];
     var products = [];
     for (let i = 0; i < checks.length; i++) {
-      orders.push(checks[i].orders);
+      checks[i].active ? orders.push(checks[i].orders) : null;
     }
     for (let i = 0; i < orders.length; i++) {
       productsIds.push(orders[i][0].productId);
@@ -1122,7 +1122,7 @@ routes.get("/comanda/:clientId", async (req, res) => {
       products[i].quantity = orders[i][0].quantity;
     }
 
-    return res.status(200).json(checks);
+    return res.status(200).json(products);
   } catch (error) {
     console.error(error);
     return res.status(500).json(error);
